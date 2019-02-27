@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from urllib.request import urlopen, urlretrieve
 from html.parser import HTMLParser
 import json
