@@ -16,6 +16,7 @@ class Application:
         html = urlopen(url).read().decode('utf-8')
         url_parser = URLParser()
         url_parser.feed(html)
+        url_parser.remove_articles_without_results()
         pollhandler = PollHandler(url_parser.articles)
         pollhandler.load_archive_keys()
         pollhandler.set_missing_aricles()
@@ -52,7 +53,6 @@ class Publisher:
             api_base_url = self.login_info["api_base_url"]
         )
         
-        import pdb
         pdb.set_trace()
 
         for article in articles:
@@ -60,9 +60,6 @@ class Publisher:
             title = articles[article][0]
             pro = articles[article][1]
             contra = articles[article][2]
-            
-            if pro == -1 or contra == -1:
-                continue
             
             winner = "---"
             if(articles[article][3] == 'left'):
@@ -249,7 +246,11 @@ class URLParser(HTMLParser):
                 return val
         return ''
 
-
+    def remove_articles_without_results(self):
+        for article in self.articles.keys():
+            if self.articles[article][1] == -1 or self.articles[article][2] == -1:
+                self.articles.pop(article)
+            
 class Article:
     # TODO: Introduce the article class for a better overview
     def __init__(self):
