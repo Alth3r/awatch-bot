@@ -2,10 +2,14 @@ from urllib.request import urlopen, urlretrieve
 from html.parser import HTMLParser
 import json
 from mastodon import Mastodon
+import os.path
+import datetime
+import time
 
 BASE_URL = "https://www.abgeordnetenwatch.de"
 KEY_FILE = "urls.json"
 LOGIN_FILE = "credentials.json"
+LOG_FILE = "history.log"
 
 
 class Application:
@@ -23,6 +27,8 @@ class Application:
         publisher = Publisher()
         publisher.publish_new(pollhandler.missing_articles)
         pollhandler.complement_archive_keys()
+        logger = Logger()
+        logger.log_execution()
         
 
 
@@ -52,8 +58,7 @@ class Publisher:
             access_token = self.login_info["access_token"],
             api_base_url = self.login_info["api_base_url"]
         )
-        
-        pdb.set_trace()
+
 
         for article in articles:
             url = article
@@ -85,7 +90,7 @@ class Publisher:
                            'Bild: Quelle siehe verlinkter Artikel\n'
                            '---\n'
                            '#abgeordnetenwatch #Bundestag #Abstimmung #Politik').format(title, pro, contra, winner, date, BASE_URL, url)
-            # mastodon.status_post(post_message, media_ids=media_id)
+            mastodon.status_post(post_message, media_ids=media_id)
 
 
 
@@ -250,7 +255,23 @@ class URLParser(HTMLParser):
         for article in self.articles.keys():
             if self.articles[article][1] == -1 or self.articles[article][2] == -1:
                 self.articles.pop(article)
+      
             
+class Logger:
+    def __init__(self):
+        pass
+    
+    def _check_for_logfile(self):
+        if os.path.isfile(LOG_FILE):
+            file = open(LOG_FILE, "w")
+            
+    def log_execution(self):
+        ts = time.time()
+        st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+        file_content = "Script has been successfully executet on {}.\n".format(st)
+        with open(LOG_FILE, "a") as myfile:
+            myfile.write(file_content)
+
 class Article:
     # TODO: Introduce the article class for a better overview
     def __init__(self):
