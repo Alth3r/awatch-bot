@@ -5,6 +5,7 @@ Gets entries from https://www.abgeordnetenwatch.de/bundestag/abstimmungen and po
 This project is not suppost to run stable by any means. It is just a little side project for me. Feel free to adjust the code to your liking :D
 
 ## Requirements
+- Python 3
 - Mastodon.py
 
 ## Installation
