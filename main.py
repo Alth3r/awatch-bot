@@ -69,8 +69,8 @@ class Publisher:
                 winner = "Pro"
             else:
                 winner = "Contra"
-            date = articles[article][4]
-            image = articles[article][5]
+            date = articles[article][3]
+            image = articles[article][4]
             image_data = urlopen(image).read()
             print("Publish: %s - %s - %s - %s - %s - %s - %s" % (title,
                                                                  pro,
@@ -88,7 +88,7 @@ class Publisher:
                             'Bild: Quelle siehe verlinkter Artikel\n'
                             '---\n'
                             '#abgeordnetenwatch #Bundestag #Abstimmung #Politik').format(title, pro, contra, winner, date, BASE_URL, url)
-            # mastodon.status_post(post_message, media_ids=media_id)
+            mastodon.status_post(post_message, media_ids=media_id)
 
 
 class PollHandler:
