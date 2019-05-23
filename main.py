@@ -30,7 +30,6 @@ class Application:
         pollhandler.complement_archive_keys()
         logger = Logger()
         logger.log_execution()
-        
 
 
 class Publisher:
@@ -39,7 +38,7 @@ class Publisher:
     def __init__(self):
         self.login_info = {}
         self._get_cedentials()
-    
+
     def _get_cedentials(self):
         with open(LOGIN_FILE, "r", encoding="utf-8") as file:
             keys = file.read()
@@ -48,29 +47,27 @@ class Publisher:
         else:
             print("ERROR: No content in given file found.")
             return
-        
-    
+
     def publish_new(self, articles):
         """Responsible to publish the given articles to console for now."""
-        
-        mastodon = Mastodon(
-            client_id = self.login_info["client_id"],
-            client_secret = self.login_info["client_secret"],
-            access_token = self.login_info["access_token"],
-            api_base_url = self.login_info["api_base_url"]
-        )
 
+        mastodon = Mastodon(
+            client_id=self.login_info["client_id"],
+            client_secret=self.login_info["client_secret"],
+            access_token=self.login_info["access_token"],
+            api_base_url=self.login_info["api_base_url"]
+        )
 
         for article in articles:
             url = article
             title = articles[article][0]
             pro = articles[article][1]
             contra = articles[article][2]
-            
+
             winner = "---"
-            if(articles[article][3] == 'left'):
+            if(pro > contra):
                 winner = "Pro"
-            elif(articles[article][3] == 'right'):
+            else:
                 winner = "Contra"
             date = articles[article][4]
             image = articles[article][5]
@@ -85,14 +82,13 @@ class Publisher:
 
             media_id = mastodon.media_post(image_data, 'image/jpeg')
             post_message = ('Abstimmung im Bundestag: "{}"\n\n'
-                           'Mit {} zu {} gewinnt die {}-Seite!\n\n'
-                           'Datum: {}\n'
-                           'Quelle: {}{}\n'
-                           'Bild: Quelle siehe verlinkter Artikel\n'
-                           '---\n'
-                           '#abgeordnetenwatch #Bundestag #Abstimmung #Politik').format(title, pro, contra, winner, date, BASE_URL, url)
-            mastodon.status_post(post_message, media_ids=media_id)
-
+                            'Mit {} zu {} gewinnt die {}-Seite!\n\n'
+                            'Datum: {}\n'
+                            'Quelle: {}{}\n'
+                            'Bild: Quelle siehe verlinkter Artikel\n'
+                            '---\n'
+                            '#abgeordnetenwatch #Bundestag #Abstimmung #Politik').format(title, pro, contra, winner, date, BASE_URL, url)
+            # mastodon.status_post(post_message, media_ids=media_id)
 
 
 class PollHandler:
@@ -147,7 +143,6 @@ class URLParser(HTMLParser):
         self.in_left = False
         self.in_right = False
         self.in_date = False
-        self.current_winner = ''
         self.articles = {}
         self.current_link = ''
         self.current_title = ''
@@ -167,18 +162,14 @@ class URLParser(HTMLParser):
         elif tag == 'a' and self.in_article and self.in_title:
             self.in_content = True
             self.current_link = self.get_href_from_attrs(attrs)
-        # Detect the values of the poll
+        # TODO Check if content of elif is in the right place
         elif tag == 'div' and "tile__pollchart__value_left" in self.\
                 get_class_from_attrs(attrs) and self.in_article:
             self.in_left = True
-            if "won" in attrs[0][1]:
-                self.current_winner = 'left'
-        # Detect winner of the poll
+        # TODO Check if content of elif is in the right place
         elif tag == 'div' and "tile__pollchart__value_right" in self.\
                 get_class_from_attrs(attrs) and self.in_article:
             self.in_right = True
-            if "won" in attrs[0][1]:
-                self.current_winner = 'right'
         # Detect date of the poll
         elif tag == 'span' and self.in_article:
             try:
@@ -197,10 +188,8 @@ class URLParser(HTMLParser):
             self.articles[self.current_link] = (self.current_title,
                                                 self.current_left,
                                                 self.current_right,
-                                                self.current_winner,
                                                 self.current_date,
                                                 self.current_image)
-            self.current_winner = ''
             self.current_left = -1
             self.current_right = -1
             self.current_date = ''
@@ -256,22 +245,23 @@ class URLParser(HTMLParser):
         for article in self.articles.keys():
             if self.articles[article][1] == -1 or self.articles[article][2] == -1:
                 self.articles.pop(article)
-      
-            
+
+
 class Logger:
     def __init__(self):
         pass
-    
+
     def _check_for_logfile(self):
         if os.path.isfile(LOG_FILE):
             file = open(LOG_FILE, "w")
-            
+
     def log_execution(self):
         ts = time.time()
         st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
         file_content = "Script has been successfully executet on {}.\n".format(st)
         with open(LOG_FILE, "a") as myfile:
             myfile.write(file_content)
+
 
 class Article:
     # TODO: Introduce the article class for a better overview
