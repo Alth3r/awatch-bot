@@ -1,6 +1,9 @@
 # awatch-bot
 Gets entries from https://www.abgeordnetenwatch.de/bundestag/abstimmungen and posts new entries to mastodon.
 
+## Current Version
+1.0
+
 ## Warning
 This project is not suppost to run stable by any means. It is just a little side project for me. Feel free to adjust the code to your liking :D
 
