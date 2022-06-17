@@ -1,4 +1,4 @@
-# awatch-bot
+# awatch-bot (DISCONTINUED)
 Gets entries from https://www.abgeordnetenwatch.de/bundestag/abstimmungen and posts new entries to mastodon.
 
 ## Current Version
